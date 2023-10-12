@@ -4,20 +4,41 @@ import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
-@Table
+@Table(name = "product")
 public class Product {
 
     @Id
     @SequenceGenerator(name = "product_sequence", sequenceName = "product_sequence", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_sequence")
+    @Column(name = "product_id", nullable = false)
     private Long id;
+
+    @Column(name = "product_name", nullable = false, unique = true)
     private String name;
+
+    @Column(name = "product_description", nullable = false)
     private String description;
+
+    @Column(name = "product_harvesting_date", nullable = false)
     private LocalDate harvestingDate;
+
+    @Column(name = "product_status", nullable = false)
     private Boolean status;
+
+    @Column(name = "product_category", nullable = false)
+    private String category;
 
     public Product() {
 
+    }
+
+    public Product(Long id, String name, String description, LocalDate harvestingDate, Boolean status, String category) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.harvestingDate = harvestingDate;
+        this.status = status;
+        this.category = category;
     }
 
     public Product(Long id, String name, String description, LocalDate harvestingDate, Boolean status) {
@@ -29,11 +50,12 @@ public class Product {
     }
 
 
-    public Product(String name, String description, LocalDate harvestingDate, Boolean status) {
+    public Product(String name, String description, LocalDate harvestingDate, Boolean status, String category) {
         this.name = name;
         this.description = description;
         this.harvestingDate = harvestingDate;
         this.status = status;
+        this.category = category;
     }
 
 
@@ -58,6 +80,9 @@ public class Product {
         return status;
     }
 
+    public String getCategory() {
+        return category;
+    }
 
     // Setters
     public void setId(Long id) {
@@ -80,6 +105,9 @@ public class Product {
         this.status = status;
     }
 
+    public void setCategory(String category) {
+        this.category = category;
+    }
 
     @Override
     public String toString() {
@@ -89,6 +117,7 @@ public class Product {
                 ", description='" + description + '\'' +
                 ", harvestingDate=" + harvestingDate +
                 ", status=" + status +
+                ", category='" + category + '\'' +
                 '}';
     }
 }

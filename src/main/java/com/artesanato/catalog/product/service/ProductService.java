@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -27,10 +28,11 @@ public class ProductService {
         return productRepository.findAll();
     }
 
+
     // Adds new Product in to database
     public void addNewProduct(Product product) {
 
-        System.out.println("POST REQUEST | TRYING TO CREATE Product: " + product);
+        logger.info("POST REQUEST | TRYING TO CREATE Product: {}" + product);
 
         Optional<Product> productOptional = productRepository
                 .findProductByName(product.getName());
@@ -43,6 +45,7 @@ public class ProductService {
         else {
             // Saves the student into DB
             productRepository.save(product);
+            logger.info("Created product: {}", product);
         }
     }
 
@@ -52,7 +55,7 @@ public class ProductService {
         Set<Product> readyProductEntities = new HashSet<>();
 
         for(Product product : productEntities) {
-            System.out.println("POST REQUEST | TRYING TO CREATE List of Product: " + productEntities);
+            logger.info("POST REQUEST | TRYING TO CREATE List of Product: " + productEntities);
 
             Optional<Product> productOptional = productRepository
                     .findProductByName(product.getName());
@@ -87,6 +90,7 @@ public class ProductService {
     }
 
 
+
     // Updates the product entirely according to an ID
     public void updateProduct(Product product) {
 
@@ -102,6 +106,7 @@ public class ProductService {
             existingProduct.setDescription(product.getDescription());
             existingProduct.setHarvestingDate(product.getHarvestingDate());
             existingProduct.setStatus(product.getStatus());
+            existingProduct.setCategory(product.getCategory());
 
             // Saves in DB the object with new data
             productRepository.save(existingProduct);
@@ -112,7 +117,7 @@ public class ProductService {
         }
     }
 
-    // VER COMO MELHORAR
+    // VER COMO MELHORAR -----> A NAO SER USADO
     // It only updates "description" field because its set to update Strings
     public Product partialUpdateProduct(long id, Map<String, Object> fields) {
         // Checks if the product exists in the DB
@@ -130,5 +135,72 @@ public class ProductService {
             throw new IllegalStateException("PATCH -> Product doesnt exist so it cant be updated");
         }
 
+    }
+
+    // Update product status
+    public Product updateProductStatus(long id, Map<String, Boolean> fields) {
+        logger.info("TRYING TO PATCH PRODUCT -> status");
+        Product product = new Product();
+        Optional<Product> existingProduct = productRepository.findById(id);
+
+        if(existingProduct.isPresent()) {
+            logger.info("Product before: ", existingProduct);
+
+            if(fields.containsKey("status")) {
+                Boolean status = fields.get("status");
+                Product p = productRepository.findProductById(id);
+
+                product.setId(p.getId());
+                product.setName(p.getName());
+                product.setDescription(p.getDescription());
+                product.setCategory(p.getCategory());
+                product.setHarvestingDate(p.getHarvestingDate());
+                product.setStatus(status);
+
+                productRepository.save(product);
+                logger.info("Product after: ", product);
+            }
+            logger.info("SUCCESS ON PATCH Product status: {}");
+        }
+        else {
+            throw new IllegalStateException("PATCH status -> Product doesnt exist so it cant be updated");
+        }
+        return product;
+    }
+
+    // Update Product description
+    public Product updateProductDescription(long id, Map<String, String> fields) {
+        logger.info("TRYING TO PATCH PRODUCT -> description");
+        Product product = new Product();
+        Optional<Product> existingProduct = productRepository.findById(id);
+
+        if(existingProduct.isPresent()) {
+            logger.info("Product before: ", existingProduct);
+
+            if(fields.containsKey("description")) {
+                String description = fields.get("description");
+                Product p = productRepository.findProductById(id);
+
+                product.setId(p.getId());
+                product.setName(p.getName());
+                product.setDescription(description);
+                product.setCategory(p.getCategory());
+                product.setHarvestingDate(p.getHarvestingDate());
+                product.setStatus(p.getStatus());
+
+                productRepository.save(product);
+                logger.info("Product after: ", product);
+            }
+            logger.info("SUCCESS ON PATCH Product status: {}");
+        }
+        else {
+            throw new IllegalStateException("PATCH description -> Product doesnt exist so it cant be updated");
+        }
+        return product;
+    }
+
+    // Returns one single product by ID
+    public Optional<Product> findProductById(Long id) {
+        return productRepository.findById(id);
     }
 }
