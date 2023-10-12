@@ -57,9 +57,16 @@ public class UserController {
         }
     }
 
+    // Updates User email
     @PatchMapping(path = "/updateEmail/{userId}")
     public User patchUserEmail(@PathVariable long userId, @RequestBody Map<String, String> fields) {
         return userService.updateUserEmail(userId, fields);
+    }
+
+    // Updates User role
+    @PatchMapping(path = "/updateRole/{userId}")
+    public User patchUserRole(@PathVariable long userId, @RequestBody Map<String, String> fields) {
+        return userService.updateUserRole(userId, fields);
     }
 
 }
